@@ -8,16 +8,15 @@
 class Solution
 {
 public:
-    bool hasAll(unordered_map<char, int> &has,
-                unordered_map<char, int> &need)
+    bool cover(unordered_map<char, int> &need, unordered_map<char, int> &has)
     {
-        for (auto &n : need)
+        for (auto &pr : need)
         {
-            if (has.find(n.first) == has.end())
+            if (has.find(pr.first) == has.end())
             {
                 return false;
             }
-            else if (has[n.first] < n.second)
+            if (has[pr.first] < pr.second)
             {
                 return false;
             }
@@ -27,36 +26,46 @@ public:
 
     string minWindow(string s, string t)
     {
-        int left = 0, right = 0;
-        string ret;
-        unordered_map<char, int> has;
         unordered_map<char, int> need;
-        vector<int> index;
-        index.push_back(0);
-        index.push_back(s.length() + 1);
-        for (auto c : t)
+        unordered_map<char, int> has;
+        int index = 0, len = s.length();
+        bool find = false;
+        for (char &ch : t)
         {
-            need[c] = need.find(c) == need.end() ? 1 : need[c] + 1;
+            need[ch]++;
         }
-        while (right <= s.length() && left <= right)
+        if (need.find(s[0]) != need.end())
         {
-            if (!hasAll(has, need))
+            has[s[0]]++;
+        }
+        int left = 0, right = 1;
+        while (left < right && right <= s.size())
+        {
+            // 如果完全包含
+            if (cover(need, has))
             {
-                has[s[right]] = has.find(s[right]) == has.end() ? 1 : has[s[right]] + 1;
-                right++;
+                find = true;
+                if (right - left < len)
+                {
+                    index = left;
+                    len = right - left;
+                }
+                if (has.find(s[left]) != has.end())
+                {
+                    has[s[left]]--;
+                }
+                left++;
             }
             else
             {
-                if (right - left < index[1] - index[0])
+                if (need.find(s[right]) != need.end())
                 {
-                    index[0] = left;
-                    index[1] = right;
+                    has[s[right]]++;
                 }
-                left++;
-                has[s[left - 1]]--;
+                right++;
             }
         }
-        return index[1] - index[0] == s.length() + 1 ? ret : s.substr(index[0], index[1] - index[0]);
+        return find ? s.substr(index, len) : "";
     }
 };
 // @lc code=end

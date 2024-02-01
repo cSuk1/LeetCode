@@ -5,93 +5,54 @@
  */
 #include "a_header.h"
 // @lc code=start
-// class Solution
-// {
-// public:
-//     int volume(vector<int> &height, int start, int end, int h)
-//     {
-//         int ret = 0;
-//         for (size_t i = start + 1; i < end; i++)
-//         {
-//             int diff = h - height[i];
-//             ret += (diff > 0) ? diff : 0;
-//             height[i] = (diff > 0) ? h : height[i];
-//         }
-//         return ret;
-//     }
-
-//     int trap(vector<int> &height)
-//     {
-//         int pre = 0, nx = height.size() - 1, res = 0;
-//         unordered_set<int> layers;
-//         layers.insert(0);
-//         while (pre < nx)
-//         {
-//             if (height[pre] <= height[nx])
-//             {
-//                 if (layers.find(height[pre]) == layers.end())
-//                 {
-//                     res += volume(height, pre, nx, height[pre]);
-//                     layers.insert(height[pre]);
-//                 }
-//                 pre++;
-//             }
-//             else
-//             {
-//                 if (layers.find(height[nx]) == layers.end())
-//                 {
-//                     res += volume(height, pre, nx, height[nx]);
-//                     layers.insert(height[nx]);
-//                 }
-//                 nx--;
-//             }
-//         }
-//         return res;
-//     }
-// };
 class Solution
 {
 public:
-    int trap(vector<int> &height)
+    int trap(vector<int> &heights)
     {
-        int n = height.size();
-        if (n == 0)
-        {
-            return 0;
-        }
-
-        int left = 0, right = n - 1;
-        int leftMax = 0, rightMax = 0;
+        int len = heights.size();
+        int left = 0, right = len - 1;
+        // 当前遍历到的左右的最高高度
+        int left_height = 0, right_height = 0;
+        int height;
         int water = 0;
-
         while (left < right)
         {
-            if (height[left] <= height[right])
+            // 如果左边柱子高度较低
+            if (heights[left] <= heights[right])
             {
-                if (height[left] > leftMax)
+                height = heights[left];
+                // 更新左边最高高度，这一列无法接到雨水
+                if (height > left_height)
                 {
-                    leftMax = height[left];
+                    left_height = height;
                 }
                 else
                 {
-                    water += leftMax - height[left];
+                    // 这一列可以接到雨水
+                    water += left_height - height;
                 }
+                // 向右移动
                 left++;
             }
             else
             {
-                if (height[right] > rightMax)
+                // 如果右边柱子高度较低
+                height = heights[right];
+                // 更新右边最高高度，这一列无法接到雨水
+                if (height > right_height)
                 {
-                    rightMax = height[right];
+                    right_height = height;
                 }
                 else
                 {
-                    water += rightMax - height[right];
+                    // 这一列可以接到雨水
+                    water += right_height - height;
                 }
+                // 向左移动
                 right--;
             }
         }
-
         return water;
     }
 };
